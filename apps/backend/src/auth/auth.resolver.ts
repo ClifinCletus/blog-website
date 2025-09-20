@@ -1,35 +1,32 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { Auth } from './entities/auth.entity';
-import { CreateAuthInput } from './dto/create-auth.input';
-import { UpdateAuthInput } from './dto/update-auth.input';
+import { AuthPayload } from './entities/auth-payload.entity';
+import { SiginInInput } from './dto/signin.input';
 
-@Resolver(() => Auth)
+@Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => Auth)
-  createAuth(@Args('createAuthInput') createAuthInput: CreateAuthInput) {
-    return this.authService.create(createAuthInput);
-  }
+  /**
+   * ======================================================
+   * ✅ signIn Mutation
+   * ======================================================
+   * - Purpose: Handle user login from GraphQL API.
+   * - Process:
+   *   1. Take "signInInput" (email + password).
+   *   2. Call AuthService.validateLocalUser to check credentials.
+   *   3. If valid → call AuthService.login to get JWT + user info.
+   *   4. Return that info to the client.
+   * - Why done in Resolver? Because in GraphQL, queries & mutations
+   *   are the entry points for client requests.
+   */
+  //here we used multiple services to perform an operation
+  @Mutation(() => AuthPayload) //as in the mutation or query, we may provide the return type, hence we created a entity for the reutrn type(here we returns user info and access token from the login service)
+  async signIn(@Args('signInInput') siginInInput: SiginInInput) {
+    // Step 1: Validate user credentials
+    const user = await this.authService.validateLocalUser(siginInInput);
 
-  @Query(() => [Auth], { name: 'auth' })
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Query(() => Auth, { name: 'auth' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.authService.findOne(id);
-  }
-
-  @Mutation(() => Auth)
-  updateAuth(@Args('updateAuthInput') updateAuthInput: UpdateAuthInput) {
-    return this.authService.update(updateAuthInput.id, updateAuthInput);
-  }
-
-  @Mutation(() => Auth)
-  removeAuth(@Args('id', { type: () => Int }) id: number) {
-    return this.authService.remove(id);
+    // Step 2: Call login to generate JWT + return user info
+    return await this.authService.login(user);
   }
 }

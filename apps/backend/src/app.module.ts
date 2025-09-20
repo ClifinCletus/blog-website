@@ -11,6 +11,7 @@ import { CommentModule } from './comment/comment.module';
 import { TagModule } from './tag/tag.module';
 import { LikeModule } from './like/like.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -31,6 +32,10 @@ import { AuthModule } from './auth/auth.module';
       //for telling the path where to place the schema, mutations,query etc
       // Note: process.cwd() → returns your project’s root directory
       // so schema will be created at: <project-root>/src/grapghql.schema/gql
+    }),
+
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
 
     PostModule,
