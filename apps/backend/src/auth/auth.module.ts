@@ -4,7 +4,7 @@ import { AuthResolver } from './auth.resolver';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-// import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtStratergy } from './stratergies/jwt.stratergy';
 // import { GoogleStrategy } from './strategies/google.strategy';
 // import { AuthController } from './auth.controller';
 
@@ -41,7 +41,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     AuthResolver,
     AuthService,
     PrismaService,
-    // JwtStrategy,
+    JwtStratergy,
     // GoogleStrategy,
   ],
   // controllers: [AuthController],
